@@ -1,7 +1,13 @@
 from django.contrib import admin
 from .models import *
 # Register your models here.
-admin.site.register(Cafe)
+
+class PhotoInline(admin.TabularInline):
+    model = Image
+class CafeAdmin(admin.ModelAdmin):
+    inlines = [PhotoInline, ]
+
+admin.site.register(Cafe, CafeAdmin)
 admin.site.register(Review)
 admin.site.register(Product)
 admin.site.register(Image)

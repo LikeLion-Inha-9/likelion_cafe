@@ -7,8 +7,8 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 
 class CustomUser(AbstractUser):
-	nickname = models.CharField(max_length=100, blank=True, null=True)
-
+    nickname = models.CharField(max_length=100, blank=True, null=True) #리뷰에 사용될 닉네임이 저장될 곳
+    steamed_list = models.IntegerField(blank=True, null=True) #찜한 카페 PK인 id를 저장할 곳
 class Cafe(models.Model): # 카페 클래스
     Relax = 0
     Average = 1
@@ -40,8 +40,11 @@ class Cafe(models.Model): # 카페 클래스
     lng = models.SmallIntegerField() #경도
     thumbnail = models.ImageField(default ="#") #썸네일 이미지
     operating_hour = models.TextField(blank=True) #운영시간
-    close_day = models.TextField(blank=True, choices=WEEK)  #ㅇㅣ거는 choices 활용해서 다시한번더 바꿔보기/
-    cafe_phone_number = models.TextField(blank=True)
+    close_day = models.TextField(blank=True, choices=WEEK)  #휴무일
+    cafe_phone_number = models.TextField(blank=True) #카페 전화번호
+    rating = models.IntegerField(blank=True) # 카페 별점 점수를 저장하는 곳
+    number_of_reivew = models.IntegerField(default=0) # 별점 평균을 저장하기 위해 리뷰 수 저장
+    sum_of_reivew = models.IntegerField(default=0) # 별점 평균을 저장하기 위해 리뷰레이팅의 합 저장
 class Review(models.Model): # 리뷰 서비스
     Star1 = 1
     Star2 = 2
@@ -58,7 +61,7 @@ class Review(models.Model): # 리뷰 서비스
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE) # 카페 하나에 종속
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     writer = models.CharField(max_length=20)# 작성자
-    rating = models.SmallIntegerField(default=5, choices=RATING) # 별점
+    rating = models.SmallIntegerField(default=5, choices=RATING) # 별점을 사용자로부터 입력받기 위해 사용
     comment = models.TextField() #리뷰내용
 
 
@@ -75,16 +78,17 @@ class Image(models.Model): # 이미지
     representative_image = models.ImageField() #카페 대표 이미지
 
 class Coupon(models.Model):
-    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
+    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE) #카페, 유저에 종속되도록
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    stamp = models.IntegerField(default=0)
-    prizes = models.TextField(default="아메리카노 1잔")
-    free_coupon = models.IntegerField(default=0)
+    stamp = models.IntegerField(default=0) # 도장
+    prizes = models.TextField(default="아메리카노 1잔") #상품
+    free_coupon = models.IntegerField(default=0) # 도장을 다 채웠을 때 주어지는 상품권
    
 class Queuing(models.Model):
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
-    total = models.IntegerField(default=0)
-    used_table = models.IntegerField(default=0)
+    wating_number = models.IntegerField(default=1)
     waiting_team = models.IntegerField(default=0)
     estimated_latency_default = models.IntegerField(default=30)
     estimated_latency = models.IntegerField(default=0)
+
+#대기열 개인별 대기표와 카페별 대기열로 모델 나눠서 다시 만들기 

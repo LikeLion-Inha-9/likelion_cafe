@@ -20,8 +20,9 @@ def cafe_create(req): #카페 생성
         cafe_object.explanation = req.POST['explanation']
         cafe_object.reservation_available = req.POST['reservation']
         cafe_object.charge_available = req.POST['charge']
-        cafe_object.total_seats = req.POST['total_seats']
-        cafe_object.congestion_status = req.POST['congestion_status']
+        cafe_object.total_seats = int(req.POST['total_seats'])
+        cafe_object.congestion_status = int(req.POST['congestion_status'])
+        #cafe_object.congestion_status = req.POST['congestion_status']
         # 위치랑 경도 받아오는 거 작업하기.(네이버 지도)
         cafe_object.thumbnail = req.POST['thumbnail']
         cafe_object.close_day = req.POST['close_day']
@@ -40,10 +41,19 @@ def cafe_read(req, id): #카페 읽어오기
 
     cafe_object = get_object_or_404(Cafe, pk=id)
     reviews = cafe_object.review_set.all()
-    content = {
+    if cafe_object.reservation_available:
+        queuing = cafe_object.queuing_set.all()
+        content = {
+        'data' : cafe_object,
+        'reviews' :  reviews,
+        'queuing' : queuing,
+    }
+    else:
+        content = {
         'data' : cafe_object,
         'reviews' :  reviews,
     }
+    
     return render(req, 'cafe.html', content)
 
 def cafe_edit(req, id):  #카페 내용 수정
@@ -54,7 +64,7 @@ def cafe_edit(req, id):  #카페 내용 수정
         cafe_object.explanation = req.POST['explanation']
         cafe_object.reservation_available = req.POST['reservation']
         cafe_object.charge_available = req.POST['charge']
-        cafe_object.total_seats = req.POST['total_seats']
+        cafe_object.total_seats = int(req.POST['total_seats'])
         cafe_object.congestion_status = req.POST['congestion_status']
         # 위치랑 경도 받아오는 거 작업하기.
         cafe_object.operating_hour = req.POST['operating_hour']
@@ -76,14 +86,19 @@ def cafe_delete(req, id): #카페 삭제
 def reivew_create(req, id):
     if req.method == 'POST':
         cafe_object = get_object_or_404(Cafe, pk=id)
-        #user = User.objects.get(user=req.user)
         user = CustomUser.objects.get(user=req.user)
         cafe_object.reivew_set.create(writer = user.nickname, rating = req.POST['rating'], comment = req.POST['comment'])
-        #여기서 회원 닉네임 가져오는 거 추가해서 처리하기
+        cafe_object.number_of_reivew += 1
+        cafe_object.sum_of_reivew += int(req.POST['rating'])
+        cafe_object.rating = int(cafe_object.sum_of_reivew/cafe_object.number_of_reivew)
     return redirect('/cafe/'+ str(id))
 
 def review_delete(req,id):
     review_object = get_object_or_404(Review, pk=id)
+    cafe_object = review_object.cafe
+    cafe_object.number_of_reivew -=1
+    cafe_object.sum_of_reivew -= review_object.rating
+    cafe_object.rating = int(cafe_object.sum_of_reivew/cafe_object.number_of_reivew)
     review_object.delete()
     return redirect('/')
 
@@ -98,13 +113,13 @@ def review_modify(req, id):
         #return redirect('/cafe/'+str(id))
     #return render(req, 'cafe_edit.html', {'data' : cafe_object})
 
-##################################쿠폰관련#############################
+##################################쿠폰관련######################################
 
     def coupon_create(req,id):
         coupon_object = Coupon()
         coupon_object.user = req.user
         coupon_object.cafe = Cafe.objects.filter(id=id)
-        coupon_object.save
+        coupon_object.save()
         
     def coupon_stamping(req, id):
         user_object = req.user
@@ -122,7 +137,7 @@ def review_modify(req, id):
         if coupon_object.free >= 1:
             coupon_object.free_coupon -= 1
 
-#################################로그인 관련############################
+##################################회원가입, 로그인, 로그아웃######################################
  
 def signup_view(request):
 	res_data = {}
@@ -158,3 +173,18 @@ def login_view(request):
 def logout_view(request):
 	auth.logout(request)
 	return redirect('home')
+
+
+##################################대기열######################################
+
+def add_queue(req, id): #대기열 추가인데. 유저당 대기번호를 하나씩 발급해 주어야 하나. 일단 프로토 타입임으로 임시로 보여주기식
+    queueing_object = get_object_or_404(Queuing, pk = id)
+    queueing_object.waiting_team += 1
+    queueing_object.wating_number += 1
+    queueing_object.estimated_latency = queueing_object.waiting_team*queueing_object.estimated_latency_default
+
+def cancel_queue(req,id):
+    queueing_object = get_object_or_404(Queuing, pk = id)
+    queueing_object.waiting_team -= 1
+    queueing_object.wating_number -= 1
+    queueing_object.estimated_latency = queueing_object.waiting_team*queueing_object.estimated_latency_default
