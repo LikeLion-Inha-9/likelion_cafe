@@ -24,3 +24,6 @@ def information(request) :
 
 def booking(request) :
     return render(request, 'booking.html')
+
+def allcafe(request) :
+    return render(request, 'allcafe.html')

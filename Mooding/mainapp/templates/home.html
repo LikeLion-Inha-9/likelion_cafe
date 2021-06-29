@@ -1,8 +1,24 @@
-{% extends 'base.html' %} {% block content %} {% load static %}
+{% extends 'base.html' %}
+{% block head %}{% endblock %}
+{% block content %}
+<form action="">
+  <div class="search-bar">
+      <input type="text" class="form-control" placeholder="찾으시는 카페나 지역을 검색하세요!"\>
+      </div>
+  </div>
+</form> 
+{% load static %}
 <section class="main">
-  <article>
-    <h2>HOME</h2>
-  </article>
+    <div class="container">
+      <section class="one">카페 모아보기</section>      
+      <section class="two">테이크 아웃</section>
+      <section class="three">쿠폰</section> 
+    </div>
 </section>
-
+<section class="ad">
+  <div class="container">
+    <section class="ad-one">광고1</section>
+    <section class="ad-two">광고2</section>
+  </div>
+</section>
 {% endblock %}
