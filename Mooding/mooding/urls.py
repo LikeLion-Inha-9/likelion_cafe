@@ -25,4 +25,5 @@ urlpatterns = [
     path('like', mainapp.views.like, name = 'like'),
     path('reserve', mainapp.views.reserve, name = 'reserve'),
     path('mypage', mainapp.views.mypage, name = 'mypage'),
+    path('allcafe', mainapp.views.allcafe, name = 'all cafe'),
 ]
