@@ -1,3 +1,18 @@
-.section .info-img {
-    margin: auto;
+.info-img {
+  display: block;
+}
+
+.info-img > img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.info-cafe {
+  height: 300px;
+  background-color: green;
+}
+
+.info-wait {
+  height: 300px;
+  background-color: pink;
 }
