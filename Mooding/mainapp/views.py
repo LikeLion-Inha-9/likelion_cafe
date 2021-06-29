@@ -16,6 +16,9 @@ def reserve(request) :
 def mypage(request) :
     return render(request, 'mypage.html')
 
+def allcafe(request) :
+    return render(request, 'allcafe.html')
+
 def coupon(request) :
     return render(request, 'coupon.html')
 
