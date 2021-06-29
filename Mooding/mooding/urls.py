@@ -27,4 +27,5 @@ urlpatterns = [
     path('mypage', mainapp.views.mypage, name = 'mypage'),
     path('coupon', mainapp.views.coupon, name = 'coupon'),
     path('information', mainapp.views.information, name = 'information'),
+    path('booking', mainapp.views.booking, name = 'booking'),
 ]

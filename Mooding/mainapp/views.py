@@ -21,3 +21,6 @@ def coupon(request) :
 
 def information(request) :
     return render(request, 'information.html')
+
+def booking(request) :
+    return render(request, 'booking.html')

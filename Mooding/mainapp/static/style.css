@@ -18,14 +18,12 @@ body {
 
 header .topbar {
   height: 70px;
-  background-color: orange;
   position: relative;
 }
 
 header .topbar span {
   transform: translate(-50%, 0%);
   position: absolute;
-  color: white;
   font-size: 18px;
   bottom: 20px;
   left: 50%;
