@@ -15,3 +15,9 @@ def reserve(request) :
 
 def mypage(request) :
     return render(request, 'mypage.html')
+
+def coupon(request) :
+    return render(request, 'coupon.html')
+
+def information(request) :
+    return render(request, 'information.html')
