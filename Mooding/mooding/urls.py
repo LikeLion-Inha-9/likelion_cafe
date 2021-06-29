@@ -16,6 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+import mainapp.views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', mainapp.views.intro, name = 'intro'),
+    path('home/', mainapp.views.home, name = 'home'),
+    path('like', mainapp.views.like, name = 'like'),
+    path('reserve', mainapp.views.reserve, name = 'reserve'),
+    path('mypage', mainapp.views.mypage, name = 'mypage'),
+    path('allcafe', mainapp.views.allcafe, name = 'all cafe'),
+    path('coupon', mainapp.views.coupon, name = 'coupon'),
+    path('information', mainapp.views.information, name = 'information'),
 ]
