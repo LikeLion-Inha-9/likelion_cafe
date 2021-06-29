@@ -1,16 +1,13 @@
-*{
-    padding:0;
-    margin:0;
-    box-sizing: border-box;
-}
 
-.containter{
-    width: 100%;
-    height: 100vh;
-    background-color: white;
-    border:5px solid white;
+.img-box .item img {
+	margin: 0 auto;
+	width: 100%;
+	border-radius: 30%;
+	
 }
-
-.item{
-    backgroundcolor: beige;
+.img-box {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	width: 100%;
+	gap:1vw;
 }
