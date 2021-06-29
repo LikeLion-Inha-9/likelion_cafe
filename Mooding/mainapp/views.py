@@ -18,3 +18,9 @@ def mypage(request) :
 
 def allcafe(request) :
     return render(request, 'allcafe.html')
+
+def coupon(request) :
+    return render(request, 'coupon.html')
+
+def information(request) :
+    return render(request, 'information.html')
