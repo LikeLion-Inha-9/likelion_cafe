@@ -29,4 +29,5 @@ urlpatterns = [
     path('information', mainapp.views.information, name = 'information'),
     path('booking', mainapp.views.booking, name = 'booking'),
     path('allcafe', mainapp.views.allcafe, name = 'all_cafe'),
+    path('review', mainapp.views.review, name = 'review'),
 ]
