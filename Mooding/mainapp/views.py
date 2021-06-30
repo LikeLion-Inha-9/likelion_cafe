@@ -24,3 +24,6 @@ def coupon(request) :
 
 def information(request) :
     return render(request, 'information.html')
+
+def takeout(request) :
+    return render(request, 'takeout.html')
