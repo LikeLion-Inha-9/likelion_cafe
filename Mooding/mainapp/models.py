@@ -1,10 +1,12 @@
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.base import Model
+from django.db.models.base import Model, ModelBase
+from django.db.models.deletion import CASCADE, DO_NOTHING
 from django.db.models.fields import CharField
 from django.contrib.auth.models import AbstractUser
 # Create your models here.
+
 
 class CustomUser(AbstractUser):
     nickname = models.CharField(max_length=100, blank=True, null=True) #리뷰에 사용될 닉네임이 저장될 곳
@@ -27,7 +29,7 @@ class Cafe(models.Model): # 카페 클래스
         ('SAT', '토요일'),
         ('SON', '일요일'),
     )
-    id = models.AutoField(primary_key=True) # 카페 아이디(프라이머리 키)
+    #id = models.AutoField(primary_key=True) # 카페 아이디(프라이머리 키)
     title = models.CharField(max_length=100) # 카페이름
     explanation = models.TextField(blank=True) # 카페 설명
     reservation_available = models.BooleanField() #예약 가능여부
@@ -36,15 +38,17 @@ class Cafe(models.Model): # 카페 클래스
     used_seats = models.SmallIntegerField(null=True) # 사용하고 있는 좌석 수
     unused_seats = models.SmallIntegerField(null=True) # 미사용 좌석 수
     congestion_status = models.SmallIntegerField(default=0, choices=CONGESTION_CHOICE) # 혼잡여부(숫자료 표현 0, 1, 2) choice 활용
-    lat = models.SmallIntegerField() #위도 (영빈이형 말대로 네이버 GPS사용하기.)(영빈이형 말로는 위도 경도는 정수가 아닌 문자열로 받아서 소수점 변환이 좋음)
-    lng = models.SmallIntegerField() #경도
+    lat = models.FloatField() #위도 (영빈이형 말대로 네이버 GPS사용하기.)(영빈이형 말로는 위도 경도는 정수가 아닌 문자열로 받아서 소수점 변환이 좋음)
+    lng = models.FloatField()#경도
     thumbnail = models.ImageField(default ="#") #썸네일 이미지
     operating_hour = models.TextField(blank=True) #운영시간
     close_day = models.TextField(blank=True, choices=WEEK)  #휴무일
-    cafe_phone_number = models.TextField(blank=True) #카페 전화번호
+    cafe_phone_number = models.CharField(max_length=14, blank=True) #카페 전화번호
     rating = models.IntegerField(blank=True) # 카페 별점 점수를 저장하는 곳
     number_of_reivew = models.IntegerField(default=0) # 별점 평균을 저장하기 위해 리뷰 수 저장
     sum_of_reivew = models.IntegerField(default=0) # 별점 평균을 저장하기 위해 리뷰레이팅의 합 저장
+    
+
 class Review(models.Model): # 리뷰 서비스
     Star1 = 1
     Star2 = 2
@@ -86,9 +90,14 @@ class Coupon(models.Model):
    
 class Queuing(models.Model):
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete = DO_NOTHING)
     wating_number = models.IntegerField(default=1)
     waiting_team = models.IntegerField(default=0)
     estimated_latency_default = models.IntegerField(default=30)
     estimated_latency = models.IntegerField(default=0)
 
 #대기열 개인별 대기표와 카페별 대기열로 모델 나눠서 다시 만들기 
+class PersonalReservation(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=CASCADE)
+    queuing_id = models.IntegerField()
+    wating_number = models.IntegerField(blank=True)

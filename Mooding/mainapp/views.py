@@ -3,6 +3,7 @@ from django.db import models
 from Mooding.mainapp.models import *
 from django.contrib import auth
 from django.shortcuts import get_object_or_404, redirect, render
+from haversine import haversine, Unit
 
 # Create your views here.
 
@@ -27,6 +28,8 @@ def cafe_create(req): #카페 생성
         cafe_object.thumbnail = req.POST['thumbnail']
         cafe_object.close_day = req.POST['close_day']
         cafe_object.cafe_phone_number = req.POST['phone_number']
+        # if cafe_object.reservation_available:
+        #     cafe_object.queuing_set.create(wating_number = 0, wating_team = 0, estimated_latency_default=10, estimated_latency=0)
         cafe_object.save()
         for img in req.FILES.getlist('#'): #여기에 이미지파일 받는 name 넣기
             photo = Image()
@@ -179,12 +182,36 @@ def logout_view(request):
 
 def add_queue(req, id): #대기열 추가인데. 유저당 대기번호를 하나씩 발급해 주어야 하나. 일단 프로토 타입임으로 임시로 보여주기식
     queueing_object = get_object_or_404(Queuing, pk = id)
+    user = req.user
     queueing_object.waiting_team += 1
     queueing_object.wating_number += 1
+    user.personalReservation_set.create(queing_id = id, wating_number = queueing_object.wating_number)
     queueing_object.estimated_latency = queueing_object.waiting_team*queueing_object.estimated_latency_default
 
 def cancel_queue(req,id):
     queueing_object = get_object_or_404(Queuing, pk = id)
+    user = req.user
+    PR = PersonalReservation()
+    PR = PR.objects.filter(user==user)
+    PR.delete()
     queueing_object.waiting_team -= 1
-    queueing_object.wating_number -= 1
     queueing_object.estimated_latency = queueing_object.waiting_team*queueing_object.estimated_latency_default
+
+
+###################################위치 정보에 따른 카페 필터##########################
+
+def location_base_sorting(self, req):
+    
+    longitude = float(req.GET.get('longitude', None))
+    latitude  = float(req.GET.get('latitude', None))
+    position  = (latitude,longitude)
+    condition = (
+        Q(latitude__range  = (latitude - 0.01, latitude + 0.01)) |
+        Q(longitude__range = (longitude - 0.015, longitude + 0.015))
+    )
+    convenience_cafes = Cafe.objects.filter(condition)
+    convenience_cafes.order_by(self.number_of_reivew)
+    near_convenience_cafes = [Cafe for Cafe in convenience_cafes
+if haversine(position, (Cafe.lat, Cafe.lng)) <= 1]
+
+    return render(req, '#', {'data' : near_convenience_cafes})
